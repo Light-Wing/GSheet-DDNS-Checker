@@ -20,9 +20,13 @@ npm install Or npm ci
 node index.js
 
 # Oprating sytems 
-Linux 
+
+Linux
+
 Windows
 
 # To do
+
 Check prefix in windows for nmap
+
 Video for the dumbis 
