@@ -18,3 +18,11 @@ Install node.JS https://nodejs.org/en/
 npm install Or npm ci
 
 node index.js
+
+# Oprating sytems 
+Linux 
+Windows
+
+# To do
+Check prefix in windows for nmap
+Video for the dumbis 
