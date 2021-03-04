@@ -11,7 +11,7 @@ Change index.js API and Sheet ID
 
 
 
-Install node.JS
+Install node.JS https://nodejs.org/en/
 
 # Open Terminal or CMD
 
