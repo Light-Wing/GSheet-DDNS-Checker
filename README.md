@@ -10,5 +10,7 @@ Change index.js API and Sheet ID
 
 
 Install node.JS
+
 npm install Or npm ci
+
 node index.js
