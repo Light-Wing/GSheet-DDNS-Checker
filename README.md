@@ -1,7 +1,7 @@
 # GSheet-DDNS-Checker
 
-In a Google sheet this script will read column A where the ddmss are and read column c, d, e, f, g where the ports are. 
-Once Nmap shows if up / down it will show the device that's under a port in a comments change the colors of the cell. 
+In a Google sheet this script will read column A where the ddns are and read column c, d, e, f, g where the ports are. 
+Once Nmap shows if up/down it will show the device that's under a port in a comments and change the colors of the cell. 
 
 
 # instructions
