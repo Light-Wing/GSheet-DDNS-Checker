@@ -1,0 +1,9 @@
+[Unit]
+Description=foo's service file
+After=network.target
+
+[Service]
+User=pi
+Type=oneshot
+WorkingDirectory=/home/pi/NoIP-Ping
+ExecStart=/usr/bin/node index.js
