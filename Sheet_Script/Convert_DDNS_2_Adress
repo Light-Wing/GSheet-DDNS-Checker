@@ -1,6 +1,7 @@
 // Nice little script that will take your DDNS and strip your DDNS link and convert them to address in a new column
 // Usefull if your DDNS conatains mostly address. 
 // You also have a manule override if you neeed it.
+// 0 Is where the DDNS is, 34, Is the Manuel override [True/False] 35 is the address 
 function onEdit(e) {
   const sheet = e.source.getActiveSheet();
   const name = e.source.getActiveSheet().getName();
