@@ -1,0 +1,29 @@
+// Nice little script that will take your DDNS and strip your DDNS link and convert them to address in a new column
+// Usefull if your DDNS conatains mostly address. 
+// You also have a manule override if you neeed it.
+function onEdit(e) {
+  const sheet = e.source.getActiveSheet();
+  const name = e.source.getActiveSheet().getName();
+  const col = e.range.getColumn(), row = e.range.getRow();
+  if(name == 'NoIP' && row > 4 && (col == 1 || col == 13)) {
+    const v = sheet.getDataRange().getValues().splice(4);
+    addr(sheet, v.map(r => r[0].split('.')[0]), v.map(r => r[34]), v.map(r => r[35]));
+  }
+}
+
+function addr(sheet, ddns, check, addr) {
+  const r = [];
+  ddns.forEach((str, i) => {
+    if(str == '' || check[i] == true) {
+      r.push([addr[i]]);
+    } else {
+      let n = str.match(/\d+/g);
+      str = str.replace(/\d+/g, '');
+      let s = str.match(/(st|ave|pl|rd)$/g);
+      str = str.replace(/(st|ave|pl|rd)$/g, '');
+      let rstr = `${n ? n[0] : ''} ${str} ${s ? s[0] : ''}`;
+      r.push([rstr.trim()]);
+    }
+  });
+  sheet.getRange(5, 36, r.length, 1).setValues(r);
+}
