@@ -36,3 +36,15 @@ Windows
 Check prefix in windows for nmap
 
 Video for the dumbis 
+
+Add 2 new col of ports in sheet. At least a explnachion. 
+
+Add note of ISP in col 1,2
+
+If isp is not empty then change color (Avoiding force online from NMap using -Pn)
+
+Evenchally index.js will go into cell instead of notes. (at least index_cell.js index_note.js
+
+ISP - should be strip to ISP Name. on new cell (For my persnal app)
+
+
