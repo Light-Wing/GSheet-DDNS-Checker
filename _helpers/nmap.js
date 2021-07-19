@@ -1,3 +1,5 @@
+const dns = require("dns");
+
 async function lookup(domain) {
   return new Promise((resolve, reject) => {
     dns.lookup(domain, (err, address, family) => {
@@ -7,6 +9,7 @@ async function lookup(domain) {
     });
   });
 }
+const nmap = require("libnmap");
 
 // nmap promise
 async function scan(opts) {

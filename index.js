@@ -26,8 +26,6 @@ required_env.forEach((key) => {
 });
 
 //'use strict';
-const dns = require("dns");
-const nmap = require("libnmap");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 // dev dep
