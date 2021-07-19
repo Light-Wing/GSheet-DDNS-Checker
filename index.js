@@ -105,26 +105,16 @@ const headers = [
 
   let opts = {
     timeout: 310,
-    //timeout: 100,
-    //timeout: 15,
-    // A List of commands can be found in Nmap.txt
-    //flags: ['-sv', '-p'], // This seams to work via command not in script (probbely the way the script works)
-    //nmap -sV -p 9000,8000,554,443, Berkowitz137.araknisdns.com
-    flags: ["-sV", "-sT", "-Pn w/Idlescan"], // This may be another option (need to test and make sure nothing goes down)
-    //flags: ['-sv', '-sT', ' --version-intensity 9 '],
-    //flags: ['-sV', '-sT', '-Pn'], //Working But seems DDNS port goes down after.
-    //flags: ['-sV', '-sT'], //XSE
+    flags: ["-sV", "-sT", "-Pn w/Idlescan"],
     ports: ports.filter(Boolean).join(","),
     range: Array.from(new Set(ips)),
   };
   console.log(
     "Timeout: ",
     [opts.timeout],
-    "\n",
-    "Flage: ",
+    "\nFlage: ",
     opts.flags,
-    "\n",
-    "Scanning Ports: ",
+    "\nScanning Ports: ",
     [opts.ports]
   );
   let reports;
@@ -155,7 +145,7 @@ const headers = [
       });
     /* else - dns ok */
 
-    if (isUp(reports[data[domain].addr]))
+    if (!isUp(reports[data[domain].addr]))
       headers.forEach((col) => {
         data[domain][col].backgroundColor = colors.down;
         console.log("host down: ", domain);
