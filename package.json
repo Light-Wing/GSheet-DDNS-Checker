@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "nodemon .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "google-spreadsheet": "^3.0.11",
+    "nodemon": "^2.0.7",
     "libnmap": "^0.4.19"
   }
 }

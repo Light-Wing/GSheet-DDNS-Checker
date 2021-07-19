@@ -33,6 +33,7 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 // dev dep
 const fs = require("fs"); // devdep: save reports for analyse
 const { colors, isIP, isUp } = require("./_helpers/utils");
+const { scan, lookup, port } = require("./_helpers/nmap");
 
 const doc = new GoogleSpreadsheet(process.env.SHEET_ID);
 const ROW_OFFSET = 4; //From Top
@@ -48,54 +49,8 @@ const headers = [
   "router",
   "modem",
 ]; //Dummi Headers Counting from 0
-//const headers = ['ddns', 'ip', 'http', 'https', 'rtsp', 'server', 'router', 'HTTP_up', 'HTTPS_up', 'RTSP_up', 'Mobile_up', 'Router_up'];
-//const UPDownStats = ['HTTP_up', 'HTTPS_up', 'RTSP_up', 'Mobile_up', 'Router_up']; // Col H to M
-
-const port = (rdata, port) => {
-  if (
-    !rdata.host[0].ports ||
-    !rdata.host[0].ports[0].port
-      .map((e) => e.item.portid)
-      .some((p) => p == port)
-  )
-    return null; // timeout
-  const find = rdata.host[0].ports[0].port.filter(
-    (e) => e.item.portid == port
-  )[0];
-
-  let ispData = rdata.host[0].hostnames[0].hostname[0].item.name;
-  return {
-    ISP: ispData,
-    protocol: find.item.protocol,
-    portid: find.item.portid,
-    state: find.state[0].item,
-    service: find.service[0].item,
-  };
-};
 
 // dns lookup promise
-
-async function lookup(domain) {
-  return new Promise((resolve, reject) => {
-    dns.lookup(domain, (err, address, family) => {
-      if (err) reject(err);
-      resolve(address);
-      //console.log('Looking up DDNS: ',domain, ' -> ',address);
-    });
-  });
-}
-
-// nmap promise
-async function scan(opts) {
-  return new Promise((resolve, reject) => {
-    nmap.scan(opts, function (err, report) {
-      if (err) reject(err);
-      resolve(report);
-      //console.log('Live Report: ',report);
-    });
-  });
-  //console.log('NMAP',opts);
-}
 
 (async () => {
   await doc.useServiceAccountAuth({
@@ -137,13 +92,10 @@ async function scan(opts) {
       );
       data[ddns.value].ip.value = ip; // MOD VALUE
       data[ddns.value]["addr"] = ip; // just to save on calls
-      //(pdata == null)
     }
   }
-  // console.log("data.json", data); // dev
-
   //console.table(ports);
-  // console.table(data, ["addr"]); // log ips
+  console.table(data, ["addr"]); // log ips
   let ports = [];
   Object.keys(data).forEach((k1) =>
     headers.slice(2).forEach((k2) => ports.push(data[k1][k2].value))
@@ -154,9 +106,9 @@ async function scan(opts) {
     .filter((ip) => isIP(ip));
 
   let opts = {
-    // timeout: 300,
+    timeout: 310,
     //timeout: 100,
-    timeout: 15,
+    //timeout: 15,
     // A List of commands can be found in Nmap.txt
     //flags: ['-sv', '-p'], // This seams to work via command not in script (probbely the way the script works)
     //nmap -sV -p 9000,8000,554,443, Berkowitz137.araknisdns.com
@@ -181,6 +133,7 @@ async function scan(opts) {
   try {
     console.log("Nmap is scanning...");
     reports = await scan(opts);
+    //fs.writeFileSync('./reports.json', JSON.stringify(reports, null, 2)); // dev
   } catch (e) {
     reports = null;
     console.log("NMAP ERROR");
@@ -211,6 +164,11 @@ async function scan(opts) {
       });
     /* else - host up */
 
+    headers.slice(0, 2).forEach((col) => {
+      data[domain][col].backgroundColor = colors.up;
+      data[domain][col].note = "host seems up";
+      /* host up COL */
+    });
     headers.slice(2).forEach((p) => {
       let pdata = port(reports[data[domain].addr], data[domain][p].value);
       pdata == null
@@ -220,35 +178,25 @@ async function scan(opts) {
           (data[domain][
             p
           ].note = `${pdata.state.reason} (${pdata.service.name}/${pdata.service.devicetype} (${pdata.service.product})`));
-
+      //console.log("pdate: ", pdata)
+      //console.log("pdate: ", )
       if (pdata !== null) {
-        //If ISP is UP
-        headers.slice(0, 2).forEach((col) => {
-          // debug("DEBUGGING",`${pdata.ISP}`)
-          if (`${pdata.ISP}` !== null) {
-            //If ISP is UP
-            data[domain][col].backgroundColor = colors.up;
-            data[domain][col].note = `host seems up: ${pdata.ISP}`;
-            //console.log(`host seems up: ${pdata.ISP}`)
-          } else if (pdata == null) {
-            //IF ISP is Down
-            headers.slice(0, 2).forEach((col) => {
-              /*DDNS ROW*/ //console.log(ISP);
-              data[domain][col].backgroundColor = colors.dns;
-              data[domain][col].note = `host seems down: No internet!`;
-              console.log("DDON", domain, " seems down");
-            });
-          }
+        //console.log("")
+        //console.log([{Stats: pdata.state.state, Domain: domain, Port: pdata.portid, Name: pdata.service.name, DeviceType: pdata.service.devicetype, Product: pdata.service.product}]);
+        /*console.info({
+	Stats: pdata.state.state, 
+    Domain: domain, 
+	Port: pdata.portid, 
+	Name: pdata.service.name, 
+	DeviceType: pdata.service.devicetype, 
+	Product: pdata.service.product
+	}); */
 
-          //console.log("pdate: ", pdata)  //console.log("pdate: ", )
-
-          //console.info("Found: ",pdata);/* host up COL */
-          //console.log([{Stats: pdata.state.state, Domain: domain, Port: pdata.portid, Name: pdata.service.name, DeviceType: pdata.service.devicetype, Product: pdata.service.product}]);
-          //console.info([pdata.state.state],domain,pdata.portid,pdata.service.name,[pdata.service.devicetype],pdata.service.product );
-          console.info(pdata);
-        });
-      }
+        //console.info([pdata.state.state],domain,pdata.portid,pdata.service.name,[pdata.service.devicetype],pdata.service.product );
+        console.info(pdata);
+      } //abe
     });
+    //console.log("host seems up: ",domain)
   });
   //  sheet.getCell(1, 1).value = new Date().toLocaleString().replace('', '').substr(0, 19); // set the 'updated' cell
   sheet.getCell(1, 1).value = new Date()
